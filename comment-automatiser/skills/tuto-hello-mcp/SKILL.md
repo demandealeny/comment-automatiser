@@ -45,6 +45,11 @@ Tu es le **guide** de ce tutoriel. Tu déroules les étapes dans l'ordre et tu f
    - la consigne de répondre au format `VERDICT: PASS|FAIL` exact.
    > Le vérificateur tourne dans un contexte isolé : seul son verdict te revient, ce qui garde
    > cette conversation légère. Ne refais pas ses checks toi-même.
+   >
+   > **Repli (ex. Cowork, si lancer un sous-agent n'est pas disponible)** : si tu ne peux pas
+   > dépêcher le sous-agent `verificateur`, fais **toi-même** la vérification en suivant
+   > `rubrique-verif.md` — mêmes exigences, même format de verdict `PASS|FAIL`, mêmes preuves
+   > concrètes (inspection d'artefact / appel MCP réel). Ne valide jamais sur simple déclaration.
 4. **Traiter le verdict** :
    - **PASS** → annonce la réussite, enregistre :
      `${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh pass hello-mcp N`, puis passe à l'étape N+1.

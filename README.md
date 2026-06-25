@@ -68,26 +68,31 @@ session et **reprendre** plus tard là où tu t'étais arrêté.
 
 ## Architecture
 
+Le dépôt est un **marketplace** (à la racine) contenant **un plugin** dans son propre sous-dossier
+`comment-automatiser/` — le format attendu par Claude Code **et** la synchro Claude.ai/Cowork.
+
 ```
 .claude-plugin/
-  plugin.json          # manifeste du plugin
-  marketplace.json     # listing marketplace (installation)
-commands/
-  start.md             # /comment-automatiser:start — catalogue + lancement
-  status.md            # /comment-automatiser:status — progression
-skills/
-  tuto-hello-mcp/
-    SKILL.md           # orchestrateur du tuto (déroule les étapes + pilote la Loop)
-    etape-1.md         # contenu, chargé à la demande
-    etape-2.md
-    etape-3.md
-    rubrique-verif.md  # critères PASS/FAIL lus par le vérificateur
-agents/
-  verificateur.md      # sous-agent de vérification (lecture seule, renvoie un verdict)
-hooks/
-  hooks.json           # SessionStart → rappel discret si un tuto est en cours (Claude Code ; ignoré par Cowork)
-scripts/
-  progress.sh          # suivi de progression (JSON persistant, via Python 3 — sans jq)
+  marketplace.json       # listing marketplace (à la racine du dépôt)
+comment-automatiser/     # le plugin (source: "./comment-automatiser")
+  .claude-plugin/
+    plugin.json          # manifeste du plugin
+  commands/
+    start.md             # /comment-automatiser:start — catalogue + lancement
+    status.md            # /comment-automatiser:status — progression
+  skills/
+    tuto-hello-mcp/
+      SKILL.md           # orchestrateur du tuto (déroule les étapes + pilote la Loop)
+      etape-1.md         # contenu, chargé à la demande
+      etape-2.md
+      etape-3.md
+      rubrique-verif.md  # critères PASS/FAIL lus par le vérificateur
+  agents/
+    verificateur.md      # sous-agent de vérification (lecture seule) — repli inline en Cowork
+  hooks/
+    hooks.json           # SessionStart → rappel discret (Claude Code ; ignoré par Cowork)
+  scripts/
+    progress.sh          # suivi de progression (JSON persistant, via Python 3 — sans jq)
 ```
 
 ## Ajouter un tutoriel

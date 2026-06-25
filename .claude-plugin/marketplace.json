@@ -9,8 +9,13 @@
   "plugins": [
     {
       "name": "comment-automatiser",
-      "source": ".",
-      "description": "Tutoriels interactifs avec une Loop de vérification qui valide chaque étape avant d'avancer."
+      "displayName": "Comment automatiser",
+      "source": "./comment-automatiser",
+      "description": "Tutoriels interactifs avec une Loop de vérification qui valide chaque étape avant d'avancer.",
+      "author": {
+        "name": "Leny Diallo"
+      },
+      "category": "productivity"
     }
   ]
 }
