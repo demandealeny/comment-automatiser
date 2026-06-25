@@ -1,0 +1,16 @@
+{
+  "name": "comment-automatiser",
+  "owner": {
+    "name": "Leny Diallo"
+  },
+  "metadata": {
+    "description": "Marketplace de tutoriels d'automatisation et d'agents IA avec boucle de vérification."
+  },
+  "plugins": [
+    {
+      "name": "comment-automatiser",
+      "source": ".",
+      "description": "Tutoriels interactifs avec une Loop de vérification qui valide chaque étape avant d'avancer."
+    }
+  ]
+}
