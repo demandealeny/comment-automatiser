@@ -10,115 +10,131 @@
 #   progress.sh pass  <tuto> <n>           # marque l'étape n réussie et avance à n+1
 #   progress.sh done  <tuto>               # marque le tuto terminé
 #   progress.sh reset <tuto>               # remet le tuto à zéro
+#   progress.sh hint                       # rappel discret si un tuto est en cours (sinon rien)
 #
-# Le fichier vit dans ${CLAUDE_PLUGIN_DATA} (fourni par Claude Code, survit aux mises à jour),
-# avec repli sur ~/.claude/comment-automatiser si la variable n'est pas définie.
+# Le fichier vit dans ${CLAUDE_PLUGIN_DATA} (fourni par Claude Code / Cowork, survit aux mises à
+# jour), avec repli sur ~/.claude/comment-automatiser si la variable n'est pas définie.
+#
+# Portabilité : aucune dépendance externe à part Python 3 (présent dans les sandbox Claude Code et
+# Cowork). On n'utilise PAS jq, qui n'est pas garanti dans tous les environnements.
 
 set -euo pipefail
 
-DATA_DIR="${CLAUDE_PLUGIN_DATA:-$HOME/.claude/comment-automatiser}"
-PROGRESS_FILE="$DATA_DIR/progress.json"
+PY="$(command -v python3 || command -v python || true)"
+if [ -z "$PY" ]; then
+  echo "ERREUR: Python 3 est requis mais introuvable." >&2
+  exit 1
+fi
 
-ensure_file() {
-  mkdir -p "$DATA_DIR"
-  if [ ! -f "$PROGRESS_FILE" ]; then
-    echo '{"tutorials":{}}' > "$PROGRESS_FILE"
-  fi
-}
+exec "$PY" - "$@" <<'PYEOF'
+import json, os, sys, datetime
 
-# jq est requis. Si absent, on le signale clairement plutôt que d'échouer en silence.
-require_jq() {
-  if ! command -v jq >/dev/null 2>&1; then
-    echo "ERREUR: 'jq' est requis mais introuvable. Installez-le (ex: apt install jq / brew install jq)." >&2
-    exit 1
-  fi
-}
+data_dir = os.environ.get("CLAUDE_PLUGIN_DATA") or os.path.join(
+    os.path.expanduser("~"), ".claude", "comment-automatiser")
+progress_file = os.path.join(data_dir, "progress.json")
 
-write_json() {
-  # jq options + filtre passés en arguments ; écriture atomique sur le fichier
-  local tmp
-  tmp="$(mktemp)"
-  jq "$@" "$PROGRESS_FILE" > "$tmp" && mv "$tmp" "$PROGRESS_FILE"
-}
 
-cmd="${1:-load}"
+def load():
+    os.makedirs(data_dir, exist_ok=True)
+    if not os.path.exists(progress_file):
+        return {"tutorials": {}}
+    try:
+        with open(progress_file, encoding="utf-8") as f:
+            data = json.load(f)
+    except (ValueError, OSError):
+        return {"tutorials": {}}
+    data.setdefault("tutorials", {})
+    return data
 
-case "$cmd" in
-  load)
-    ensure_file
-    cat "$PROGRESS_FILE"
-    ;;
 
-  get)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh get <tuto>}"
-    jq --arg t "$tuto" '.tutorials[$t] // {"status":"not_started","currentStep":0}' "$PROGRESS_FILE"
-    ;;
+def save(data):
+    os.makedirs(data_dir, exist_ok=True)
+    tmp = progress_file + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, progress_file)
 
-  step)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh step <tuto>}"
-    jq -r --arg t "$tuto" '.tutorials[$t].currentStep // 0' "$PROGRESS_FILE"
-    ;;
 
-  start)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh start <tuto> <nbEtapes>}"
-    total="${3:?Usage: progress.sh start <tuto> <nbEtapes>}"
-    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+def now():
+    return datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def dump(obj):
+    print(json.dumps(obj, ensure_ascii=False, indent=2))
+
+
+args = sys.argv[1:]
+cmd = args[0] if args else "load"
+
+
+def need(i, usage):
+    if len(args) <= i:
+        sys.stderr.write("Usage: " + usage + "\n")
+        sys.exit(1)
+    return args[i]
+
+
+data = load()
+tut = data["tutorials"]
+
+if cmd == "load":
+    save(data)
+    dump(data)
+
+elif cmd == "get":
+    t = need(1, "progress.sh get <tuto>")
+    dump(tut.get(t, {"status": "not_started", "currentStep": 0}))
+
+elif cmd == "step":
+    t = need(1, "progress.sh step <tuto>")
+    print(tut.get(t, {}).get("currentStep", 0))
+
+elif cmd == "start":
+    t = need(1, "progress.sh start <tuto> <nbEtapes>")
+    total = int(need(2, "progress.sh start <tuto> <nbEtapes>"))
     # ne réinitialise pas un tuto déjà en cours : conserve la progression existante
-    write_json --arg t "$tuto" --argjson total "$total" --arg now "$now" \
-      'if (.tutorials[$t]|not) then
-         .tutorials[$t] = {status:"in_progress", currentStep:1, totalSteps:$total, completed:[], startedAt:$now}
-       else . end'
-    jq --arg t "$tuto" '.tutorials[$t]' "$PROGRESS_FILE"
-    ;;
+    if t not in tut:
+        tut[t] = {"status": "in_progress", "currentStep": 1,
+                  "totalSteps": total, "completed": [], "startedAt": now()}
+        save(data)
+    dump(tut[t])
 
-  pass)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh pass <tuto> <n>}"
-    n="${3:?Usage: progress.sh pass <tuto> <n>}"
-    write_json --arg t "$tuto" --argjson n "$n" \
-      '.tutorials[$t].completed = ((.tutorials[$t].completed // []) + [$n] | unique)
-       | .tutorials[$t].currentStep = ($n + 1)
-       | .tutorials[$t].status = "in_progress"'
-    jq --arg t "$tuto" '.tutorials[$t]' "$PROGRESS_FILE"
-    ;;
+elif cmd == "pass":
+    t = need(1, "progress.sh pass <tuto> <n>")
+    n = int(need(2, "progress.sh pass <tuto> <n>"))
+    entry = tut.setdefault(t, {"status": "in_progress", "currentStep": 1, "completed": []})
+    entry["completed"] = sorted(set(entry.get("completed", []) + [n]))
+    entry["currentStep"] = n + 1
+    entry["status"] = "in_progress"
+    save(data)
+    dump(entry)
 
-  done)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh done <tuto>}"
-    now="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-    write_json --arg t "$tuto" --arg now "$now" \
-      '.tutorials[$t].status = "completed" | .tutorials[$t].completedAt = $now'
-    jq --arg t "$tuto" '.tutorials[$t]' "$PROGRESS_FILE"
-    ;;
+elif cmd == "done":
+    t = need(1, "progress.sh done <tuto>")
+    entry = tut.setdefault(t, {"completed": []})
+    entry["status"] = "completed"
+    entry["completedAt"] = now()
+    save(data)
+    dump(entry)
 
-  reset)
-    require_jq; ensure_file
-    tuto="${2:?Usage: progress.sh reset <tuto>}"
-    write_json --arg t "$tuto" 'del(.tutorials[$t])'
-    echo "Tutoriel '$tuto' remis à zéro."
-    ;;
+elif cmd == "reset":
+    t = need(1, "progress.sh reset <tuto>")
+    tut.pop(t, None)
+    save(data)
+    print("Tutoriel '%s' remis à zéro." % t)
 
-  hint)
-    # Rappel discret au démarrage de session : n'affiche RIEN s'il n'y a aucun tuto en cours,
-    # pour ne pas encombrer les sessions sans rapport avec les tutoriels.
-    ensure_file
-    command -v jq >/dev/null 2>&1 || exit 0
-    jq -r '
-      [ .tutorials | to_entries[] | select(.value.status == "in_progress") ] as $wip
-      | if ($wip | length) > 0 then
-          "[comment-automatiser] Tutoriel(s) en cours : "
-          + ( [ $wip[] | "\(.key) (étape \(.value.currentStep)/\(.value.totalSteps // "?"))" ] | join(", ") )
-          + ". Reprends avec /comment-automatiser:start <id> ou /comment-automatiser:status."
-        else empty end
-    ' "$PROGRESS_FILE"
-    ;;
+elif cmd == "hint":
+    # Rappel discret : n'affiche RIEN s'il n'y a aucun tuto en cours.
+    wip = [(k, v) for k, v in tut.items() if v.get("status") == "in_progress"]
+    if wip:
+        parts = ["%s (étape %s/%s)" % (k, v.get("currentStep", "?"), v.get("totalSteps", "?"))
+                 for k, v in wip]
+        print("[comment-automatiser] Tutoriel(s) en cours : " + ", ".join(parts) +
+              ". Reprends avec /comment-automatiser:start <id> ou /comment-automatiser:status.")
 
-  *)
-    echo "Commande inconnue: $cmd" >&2
-    echo "Commandes: load | get <tuto> | step <tuto> | start <tuto> <n> | pass <tuto> <n> | done <tuto> | reset <tuto>" >&2
-    exit 1
-    ;;
-esac
+else:
+    sys.stderr.write("Commande inconnue: %s\n" % cmd)
+    sys.stderr.write("Commandes: load | get <tuto> | step <tuto> | start <tuto> <n> | "
+                     "pass <tuto> <n> | done <tuto> | reset <tuto> | hint\n")
+    sys.exit(1)
+PYEOF

@@ -7,9 +7,11 @@ allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh:*)
 
 # Progression — comment-automatiser
 
-Lis l'état de progression brut :
+Avec l'outil **Bash**, exécute cette commande pour lire l'état de progression brut :
 
-!`${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh load`
+```
+${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh load
+```
 
 À partir de ce JSON, présente à l'apprenant un récapitulatif clair en français :
 

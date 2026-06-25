@@ -1,7 +1,8 @@
 # comment-automatiser
 
-Un **plugin Claude Code** qui héberge des **tutoriels interactifs** pour apprendre l'automatisation
-et les agents IA. Chaque tutoriel se déroule étape par étape et intègre une **Loop de vérification** :
+Un **plugin Claude Code & Cowork** qui héberge des **tutoriels interactifs** pour apprendre
+l'automatisation et les agents IA. Chaque tutoriel se déroule étape par étape et intègre une
+**Loop de vérification** :
 à chaque étape, un sous-agent contrôle **concrètement** que l'objectif est atteint avant de passer à
 la suivante — pas de simple « j'ai fini, on continue ».
 
@@ -19,6 +20,8 @@ indice. Bonus : la vérification tourne dans un **contexte isolé**, donc le bru
 
 ## Installation
 
+### Dans Claude Code (CLI)
+
 ```bash
 # 1. Ajouter ce dépôt comme marketplace
 /plugin marketplace add demandealeny/comment-automatiser
@@ -27,13 +30,24 @@ indice. Bonus : la vérification tourne dans un **contexte isolé**, donc le bru
 /plugin install comment-automatiser
 ```
 
-Ou, pour développer localement :
+Pour développer localement : `claude --plugin-dir /chemin/vers/comment-automatiser`
 
-```bash
-claude --plugin-dir /chemin/vers/comment-automatiser
-```
+### Dans Cowork (claude.ai)
 
-Prérequis : `jq` doit être installé (suivi de progression).
+Cowork lit **le même format de plugin** que Claude Code, via le marketplace intégré :
+
+1. Ajoute ce dépôt comme marketplace (`/plugin marketplace add demandealeny/comment-automatiser`),
+   ou ouvre **Browse plugins** dans Cowork.
+2. Clique **Install** sur `comment-automatiser`.
+
+Les commandes (`/comment-automatiser:start`, `:status`), la skill du tuto et le sous-agent
+`verificateur` fonctionnent à l'identique. Seule différence connue : Cowork **n'exécute pas encore
+les hooks `SessionStart`** ([feature request](https://github.com/anthropics/claude-code/issues/47993)),
+donc le rappel automatique des tutos en cours ne s'affiche pas — sans impact sur le déroulé, car
+`/comment-automatiser:start` et `:status` chargent la progression eux-mêmes.
+
+Prérequis : **Python 3** (présent par défaut dans les environnements Claude Code et Cowork ; aucune
+autre dépendance — pas besoin de `jq`).
 
 ## Utilisation
 
@@ -71,9 +85,9 @@ skills/
 agents/
   verificateur.md      # sous-agent de vérification (lecture seule, renvoie un verdict)
 hooks/
-  hooks.json           # SessionStart → rappel discret si un tuto est en cours
+  hooks.json           # SessionStart → rappel discret si un tuto est en cours (Claude Code ; ignoré par Cowork)
 scripts/
-  progress.sh          # suivi de progression (JSON, persistant)
+  progress.sh          # suivi de progression (JSON persistant, via Python 3 — sans jq)
 ```
 
 ## Ajouter un tutoriel
