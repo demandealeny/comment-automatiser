@@ -20,32 +20,12 @@ indice. Bonus : la vérification tourne dans un **contexte isolé**, donc le bru
 
 ## Installation
 
-### Dans Claude Code (CLI)
+Voici les étapes correctes pour ajouter le plugin :
 
-```bash
-# 1. Ajouter ce dépôt comme marketplace
-/plugin marketplace add https://github.com/demandealeny/comment-automatiser
-
-# 2. Installer le plugin
-/plugin install comment-automatiser
-```
-
-### Dans Cowork (claude.ai)
-
-Cowork lit **le même format de plugin** que Claude Code, via le marketplace intégré :
-
-1. Ajoute ce dépôt comme marketplace (`/plugin marketplace add https://github.com/demandealeny/comment-automatiser`),
-   ou ouvre **Browse plugins** dans Cowork.
-2. Clique **Install** sur `comment-automatiser`.
-
-Les commandes (`/comment-automatiser:start`, `:status`), la skill du tuto et le sous-agent
-`verificateur` fonctionnent à l'identique. Seule différence connue : Cowork **n'exécute pas encore
-les hooks `SessionStart`** ([feature request](https://github.com/anthropics/claude-code/issues/47993)),
-donc le rappel automatique des tutos en cours ne s'affiche pas — sans impact sur le déroulé, car
-`/comment-automatiser:start` et `:status` chargent la progression eux-mêmes.
-
-Prérequis : **Python 3** (présent par défaut dans les environnements Claude Code et Cowork ; aucune
-autre dépendance — pas besoin de `jq`).
+- Ouvre le menu Personnaliser dans la barre latérale gauche, puis va dans l'onglet Plugins
+- Dans la section Plugins personnels, clique sur le bouton "+", puis choisis "Ajouter un marketplace"
+- Sélectionne "Ajouter depuis un dépôt" et colle l'URL : https://github.com/demandealeny/comment-automatiser
+- Une fois le marketplace ajouté, parcours les plugins disponibles et clique sur "Installer"
 
 ## Utilisation
 
