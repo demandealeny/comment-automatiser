@@ -24,19 +24,17 @@ indice. Bonus : la vérification tourne dans un **contexte isolé**, donc le bru
 
 ```bash
 # 1. Ajouter ce dépôt comme marketplace
-/plugin marketplace add demandealeny/comment-automatiser
+/plugin marketplace add https://github.com/demandealeny/comment-automatiser
 
 # 2. Installer le plugin
 /plugin install comment-automatiser
 ```
 
-Pour développer localement : `claude --plugin-dir /chemin/vers/comment-automatiser`
-
 ### Dans Cowork (claude.ai)
 
 Cowork lit **le même format de plugin** que Claude Code, via le marketplace intégré :
 
-1. Ajoute ce dépôt comme marketplace (`/plugin marketplace add demandealeny/comment-automatiser`),
+1. Ajoute ce dépôt comme marketplace (`/plugin marketplace add https://github.com/demandealeny/comment-automatiser`),
    ou ouvre **Browse plugins** dans Cowork.
 2. Clique **Install** sur `comment-automatiser`.
 
