@@ -10,7 +10,7 @@ Une MCP Toolbox transforme tes **scénarios Make** en **outils** appelables par 
 éligible, la toolbox serait vide. On en prépare donc un, le plus simple possible.
 
 ## Marche à suivre
-1. Connecte-toi à [Make](https://www.make.com) (crée un compte gratuit si besoin).
+1. Connecte-toi à [Make](https://www.make.com/en/register?pc=demandealeny) (crée un compte gratuit si besoin).
 2. Crée un **nouveau scénario** très simple — par exemple un module **Webhook** ou **Tools >
    « Set variable »** suivi d'un module qui renvoie une valeur. L'idée : un scénario minimal qui
    « fait quelque chose » et peut se déclencher sur demande.
