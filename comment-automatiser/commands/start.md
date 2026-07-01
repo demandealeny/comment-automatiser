@@ -17,7 +17,7 @@ L'apprenant a tapé `/comment-automatiser:start $ARGUMENTS`.
 | id | Titre | Skill à invoquer | Niveau |
 |----|-------|------------------|--------|
 | `hello-mcp` | Crée ton premier MCP avec Make MCP Toolboxes | `comment-automatiser:tuto-hello-mcp` | Débutant |
-| `linkedin-crm` | De LinkedIn à ton CRM (Partie 1 : raccourci iPhone → webhook Make) | `comment-automatiser:tuto-linkedin-crm` | Intermédiaire |
+| `linkedin-crm` | De LinkedIn à ton CRM (screenshot → IA → Google Sheets) | `comment-automatiser:tuto-linkedin-crm` | Intermédiaire |
 
 ## Ce que tu dois faire
 

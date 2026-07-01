@@ -36,4 +36,7 @@ Réponds « **fait** » en me rapportant la **preuve de réception** côté Make
 - et qu'il a **reçu l'image combinée** (structure déterminée / fichier visible dans l'exécution).
 
 Tu peux me coller un extrait de ce que Make affiche (nom/type du fichier reçu, présence du header) —
-sans divulguer la clé. 🎉
+sans divulguer la clé.
+
+> ⏭️ Ton pont iPhone → Make fonctionne. À l'étape suivante, on branche une **IA** qui va **lire cette
+> image** et en extraire les infos du contact.
