@@ -43,6 +43,7 @@ session et **reprendre** plus tard là où tu t'étais arrêté.
 | id | Titre | Niveau |
 |----|-------|--------|
 | `hello-mcp` | Crée ton premier MCP avec [Make MCP Toolboxes](https://help.make.com/mcp-toolboxes) | Débutant |
+| `linkedin-crm` | De LinkedIn à ton CRM (Partie 1 : raccourci iPhone → webhook Make) | Intermédiaire |
 
 ## Architecture
 
