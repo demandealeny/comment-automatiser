@@ -11,6 +11,7 @@
       "name": "comment-automatiser",
       "displayName": "Comment automatiser",
       "source": "./comment-automatiser",
+      "version": "0.2.0",
       "description": "Tutoriels interactifs avec une Loop de vérification qui valide chaque étape avant d'avancer.",
       "author": {
         "name": "Leny Diallo"
