@@ -1,6 +1,6 @@
 {
   "name": "comment-automatiser",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Tutoriels interactifs pour apprendre l'automatisation et les agents IA, avec une boucle de vérification (Loop) qui valide chaque étape avant de passer à la suivante.",
   "author": {
     "name": "Leny Diallo"
