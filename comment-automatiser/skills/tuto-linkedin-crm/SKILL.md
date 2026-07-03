@@ -1,7 +1,7 @@
 ---
 name: tuto-linkedin-crm
 description: >-
-  Tutoriel guidé « De LinkedIn à ton CRM » : un screenshot LinkedIn capturé par un raccourci iPhone
+  Tutoriel guidé « De LinkedIn à TON CRM » : un screenshot LinkedIn capturé par un raccourci iPhone
   part vers un webhook Make, une IA en extrait les infos du contact, puis une ligne est ajoutée dans
   un Google Sheets. Déroule les étapes une par une et valide chacune par une boucle de vérification
   (Loop). À invoquer depuis /comment-automatiser:start linkedin-crm.
