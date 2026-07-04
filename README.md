@@ -56,10 +56,11 @@ Le dépôt est un **marketplace** (à la racine) contenant **un plugin** dans so
 comment-automatiser/     # le plugin (source: "./comment-automatiser")
   .claude-plugin/
     plugin.json          # manifeste du plugin
-  commands/
-    start.md             # /comment-automatiser:start — catalogue + lancement
-    status.md            # /comment-automatiser:status — progression
   skills/
+    start/
+      SKILL.md           # /comment-automatiser:start — catalogue + lancement
+    status/
+      SKILL.md           # /comment-automatiser:status — progression
     tuto-hello-mcp/
       SKILL.md           # orchestrateur du tuto (déroule les étapes + pilote la Loop)
       etape-1.md         # contenu, chargé à la demande
@@ -84,7 +85,7 @@ Le plugin est **data-driven** : un tutoriel = un dossier `skills/tuto-<id>/`.
    - `etape-1.md`, `etape-2.md`, … : le contenu de chaque étape (objectif + marche à suivre +
      ce que l'apprenant doit fournir pour être vérifié).
    - `rubrique-verif.md` : les critères `PASS/FAIL` de chaque étape, lus par le vérificateur.
-2. **Référencer le tuto** dans le catalogue de `commands/start.md` (une ligne dans le tableau).
+2. **Référencer le tuto** dans le catalogue de `skills/start/SKILL.md` (une ligne dans le tableau).
 3. C'est tout : le sous-agent `verificateur` et le suivi `progress.sh` sont **partagés** par tous les
    tutoriels, rien d'autre à brancher.
 
