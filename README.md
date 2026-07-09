@@ -22,10 +22,10 @@ indice. Bonus : la vérification tourne dans un **contexte isolé**, donc le bru
 
 Voici les étapes correctes pour ajouter le plugin :
 
-- Ouvre le menu Personnaliser dans la barre latérale gauche, puis va dans l'onglet Plugins
-- Dans la section Plugins personnels, clique sur le bouton "+", puis choisis "Ajouter un marketplace"
-- Sélectionne "Ajouter depuis un dépôt" et colle l'URL : https://github.com/demandealeny/comment-automatiser
-- Une fois le marketplace ajouté, parcours les plugins disponibles et clique sur "Installer"
+- Télécharge le plugin comment-automatiser : c'est un fichier `.zip`
+- Dans Claude Desktop, ouvre le menu Personnaliser dans la barre latérale gauche, puis va dans l'onglet Plugins
+- Dans la section Plugins personnels, clique sur "Ajouter", puis choisis "Téléverser"
+- Importe le fichier `.zip` téléchargé : le plugin est alors disponible dans ton Claude
 
 ## Utilisation
 
