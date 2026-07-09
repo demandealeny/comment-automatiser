@@ -18,6 +18,7 @@ L'apprenant a tapé `/comment-automatiser:start $ARGUMENTS`.
 |----|-------|------------------|--------|
 | `hello-mcp` | Crée ton premier MCP avec Make MCP Toolboxes | `comment-automatiser:tuto-hello-mcp` | Débutant |
 | `linkedin-crm` | De LinkedIn à ton CRM (screenshot → IA → Google Sheets) | `comment-automatiser:tuto-linkedin-crm` | Intermédiaire |
+| `make-subscenario` | Appeler un scénario Make depuis un autre (parent/enfant) | `comment-automatiser:tuto-make-subscenario` | Intermédiaire |
 
 ## Ce que tu dois faire
 

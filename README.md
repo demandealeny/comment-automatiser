@@ -44,6 +44,7 @@ session et **reprendre** plus tard là où tu t'étais arrêté.
 |----|-------|--------|
 | `hello-mcp` | Crée ton premier MCP avec [Make MCP Toolboxes](https://help.make.com/mcp-toolboxes) | Débutant |
 | `linkedin-crm` | De LinkedIn à ton CRM (screenshot → IA → Google Sheets) | Intermédiaire |
+| `make-subscenario` | Appeler un scénario Make depuis un autre (parent/enfant) | Intermédiaire |
 
 ## Architecture
 
@@ -67,6 +68,10 @@ comment-automatiser/     # le plugin (source: "./comment-automatiser")
       etape-2.md
       etape-3.md
       rubrique-verif.md  # critères PASS/FAIL lus par le vérificateur
+    tuto-make-subscenario/
+      SKILL.md
+      etape-1.md … etape-6.md
+      rubrique-verif.md
   agents/
     verificateur.md      # sous-agent de vérification (lecture seule) — repli inline en Cowork
   hooks/
