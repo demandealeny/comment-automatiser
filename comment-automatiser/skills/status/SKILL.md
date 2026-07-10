@@ -3,6 +3,7 @@ name: status
 description: Affiche la progression de l'apprenant dans les tutoriels « comment-automatiser ».
 disable-model-invocation: true
 allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh:*)
+model: sonnet
 ---
 
 # Progression — comment-automatiser
