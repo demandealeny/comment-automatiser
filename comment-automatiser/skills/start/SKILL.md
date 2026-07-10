@@ -4,6 +4,7 @@ description: Lance le menu des tutoriels « comment-automatiser » ou démarre u
 disable-model-invocation: true
 argument-hint: "[id-du-tuto]"
 allowed-tools: Bash(${CLAUDE_PLUGIN_ROOT}/scripts/progress.sh:*), Skill
+model: haiku
 ---
 
 # Menu des tutoriels — comment-automatiser
