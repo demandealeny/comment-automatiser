@@ -39,7 +39,7 @@ d'environnement le paramètrent :
 
 | Variable | Rôle | Défaut |
 |----------|------|--------|
-| `TUTO_MCP_URL` | URL du serveur MCP déployé | `https://comment-automatiser-mcp.workers.dev/mcp` (à adapter) |
+| `TUTO_MCP_URL` | URL du serveur MCP déployé | `https://tutos.comment-automatiser.fr/mcp` (à adapter) |
 | `TUTO_CLE` | Clé de licence pour débloquer les tutos **payants** (optionnelle) | vide → accès aux tutos **gratuits** uniquement |
 
 Une fois le plugin installé, vérifie la connexion avec `claude mcp list` (le serveur
@@ -88,10 +88,11 @@ comment-automatiser/     # LE PLUGIN (source: "./comment-automatiser") — mince
   hooks/hooks.json       # SessionStart → rappel discret
   scripts/progress.sh    # suivi de progression (JSON persistant, Python 3, sans jq)
 
-server/                  # LE SERVEUR MCP (contenu + accès gratuit/payant) — voir server/README.md
-  content/<id>/          # source de vérité d'un tuto : tuto.json + etape-*.md + rubrique-verif.md
-  src/                   # mcp.js (protocole), content.js, entitlements.js, index.js (Workers)
-  ...
+server/                  # LE SERVEUR MCP — appli Astro (contenu + accès gratuit/payant)
+  src/content/           # Content Collections : tutoriels/<id>.yaml, etapes/<id>/NN.md, rubriques/<id>/NN.md
+  src/lib/               # mcp.ts (protocole), content.ts (collections), entitlements.ts (droits)
+  src/pages/mcp.ts       # endpoint /mcp (SSR, prerender=false)
+  ...                    # voir server/README.md
 ```
 
 Le plugin ne contient **plus** le contenu des tutoriels : il l'obtient du serveur via les outils
@@ -103,12 +104,13 @@ MCP `lister_tutoriels`, `obtenir_tuto`, `obtenir_etape`, `obtenir_rubrique`, `li
 Désormais **côté serveur uniquement** — plus aucune réinstallation du plugin. Voir
 [`server/README.md`](server/README.md) :
 
-1. Créer `server/content/<nouvel-id>/` (`tuto.json` + `etape-*.md` + `rubrique-verif.md`).
-2. `cd server && npm run build:content && npm test`.
-3. `npx wrangler deploy`.
+1. `server/src/content/tutoriels/<id>.yaml` (`titre`, `niveau`, `acces`).
+2. `server/src/content/etapes/<id>/01.md`, `02.md`, … (contenu des étapes).
+3. `server/src/content/rubriques/<id>/01.md`, `02.md`, … (critères PASS/FAIL).
+4. `cd server && npm test && npm run build`, puis redéploie.
 
 Le tuto apparaît aussitôt dans `/comment-automatiser:start` chez tous les clients. Le champ `acces`
-(`gratuit`/`payant`) du `tuto.json` décide s'il est verrouillé derrière une clé de licence.
+(`gratuit`/`payant`) du `<id>.yaml` décide s'il est verrouillé derrière une clé de licence.
 
 ### Bonnes pratiques de vérification
 - Privilégie une preuve **observable** (fichier, commande, appel MCP réel) ; ne tombe sur du Q&A que
