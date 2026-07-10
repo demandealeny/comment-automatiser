@@ -1,0 +1,16 @@
+{
+  "name": "comment-automatiser-mcp",
+  "version": "0.3.0",
+  "description": "Serveur MCP servant le catalogue et le contenu des tutoriels comment-automatiser, avec accès gratuit/payant.",
+  "type": "module",
+  "private": true,
+  "main": "src/index.js",
+  "scripts": {
+    "build:content": "node scripts/build-content.mjs",
+    "test": "node test/smoke.mjs",
+    "dev": "node dev-server.js",
+    "deploy": "npm run build:content && wrangler deploy"
+  },
+  "author": "Leny Diallo",
+  "license": "SEE LICENSE IN ../LICENSE"
+}

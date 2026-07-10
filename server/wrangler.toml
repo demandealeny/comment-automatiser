@@ -1,0 +1,22 @@
+# Configuration Cloudflare Workers pour le serveur MCP « comment-automatiser ».
+# Déploiement :
+#   npm run build:content
+#   npx wrangler deploy
+# L'URL déployée (…workers.dev) est à mettre dans TUTO_MCP_URL côté plugin.
+
+name = "comment-automatiser-mcp"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# --- Variables non secrètes (visibles) ------------------------------------
+[vars]
+# Base des liens d'achat (l'id du tuto est ajouté à la fin).
+BASE_ACHAT_URL = "https://comment-automatiser.fr/achat"
+# Désactiver la clé démo intégrée en production : décommenter la ligne ci-dessous.
+# CLE_DEMO = "off"
+
+# --- Secrets (NE PAS mettre ici) ------------------------------------------
+# La table clé -> droits est un SECRET. La définir avec :
+#   npx wrangler secret put CLES_JSON
+# Puis coller un JSON du type :
+#   {"cle-client-abc":["linkedin-crm"],"cle-pack-pro":["*"]}

@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "comment-automatiser": {
+      "type": "http",
+      "url": "${TUTO_MCP_URL:-https://comment-automatiser-mcp.workers.dev/mcp}",
+      "headers": {
+        "X-Tuto-Cle": "${TUTO_CLE:-}"
+      }
+    }
+  }
+}

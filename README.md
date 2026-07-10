@@ -6,6 +6,13 @@ l'automatisation et les agents IA. Chaque tutoriel se déroule étape par étape
 à chaque étape, un sous-agent contrôle **concrètement** que l'objectif est atteint avant de passer à
 la suivante — pas de simple « j'ai fini, on continue ».
 
+Le **contenu des tutoriels** (catalogue, étapes, rubriques) est servi par un **serveur MCP**
+(dossier `server/`), pas figé dans le plugin. Deux conséquences :
+- **Ajouter un tutoriel = le déployer côté serveur** → il apparaît immédiatement chez tous les
+  clients déjà équipés, **sans réinstaller le plugin**.
+- **Tutoriels gratuits et payants** : le serveur ne renvoie le contenu d'un tuto payant qu'aux clés
+  de licence qui l'ont débloqué ; sinon il renvoie un **paywall** avec un lien d'achat.
+
 ## Pourquoi une « Loop » ?
 
 L'apprenant ne se contente pas de cliquer « suivant ». Quand il déclare avoir terminé une étape, le
@@ -27,6 +34,17 @@ Voici les étapes correctes pour ajouter le plugin :
 - Dans la section Plugins personnels, clique sur "Ajouter", puis choisis "Téléverser"
 - Importe le fichier `.zip` téléchargé : le plugin est alors disponible dans ton Claude
 
+Le plugin **embarque la connexion au serveur MCP** (`comment-automatiser/.mcp.json`). Deux variables
+d'environnement le paramètrent :
+
+| Variable | Rôle | Défaut |
+|----------|------|--------|
+| `TUTO_MCP_URL` | URL du serveur MCP déployé | `https://comment-automatiser-mcp.workers.dev/mcp` (à adapter) |
+| `TUTO_CLE` | Clé de licence pour débloquer les tutos **payants** (optionnelle) | vide → accès aux tutos **gratuits** uniquement |
+
+Une fois le plugin installé, vérifie la connexion avec `claude mcp list` (le serveur
+`comment-automatiser` doit apparaître connecté). Les tutoriels **gratuits** fonctionnent sans clé.
+
 ## Utilisation
 
 ```text
@@ -40,59 +58,57 @@ session et **reprendre** plus tard là où tu t'étais arrêté.
 
 ## Tutoriels disponibles
 
-| id | Titre | Niveau |
-|----|-------|--------|
-| `hello-mcp` | Crée ton premier MCP avec [Make MCP Toolboxes](https://help.make.com/mcp-toolboxes) | Débutant |
-| `linkedin-crm` | De LinkedIn à ton CRM (screenshot → IA → Google Sheets) | Intermédiaire |
-| `make-subscenario` | Appeler un scénario Make depuis un autre (parent/enfant) | Intermédiaire |
+Le catalogue est **servi dynamiquement par le serveur MCP** (`/comment-automatiser:start` appelle
+`lister_tutoriels`). À l'amorçage, il contient :
+
+| id | Titre | Niveau | Accès |
+|----|-------|--------|-------|
+| `hello-mcp` | Crée ton premier MCP avec [Make MCP Toolboxes](https://help.make.com/mcp-toolboxes) | Débutant | Gratuit |
+| `linkedin-crm` | De LinkedIn à ton CRM (screenshot → IA → Google Sheets) | Intermédiaire | Payant |
+| `make-subscenario` | Appeler un scénario Make depuis un autre (parent/enfant) | Intermédiaire | Payant |
 
 ## Architecture
 
-Le dépôt est un **marketplace** (à la racine) contenant **un plugin** dans son propre sous-dossier
-`comment-automatiser/` — le format attendu par Claude Code **et** la synchro Claude.ai/Cowork.
+Le dépôt contient **deux composants** : le **plugin** (client, à la racine + `comment-automatiser/`)
+et le **serveur MCP** (`server/`) qui sert le contenu.
 
 ```
 .claude-plugin/
   marketplace.json       # listing marketplace (à la racine du dépôt)
-comment-automatiser/     # le plugin (source: "./comment-automatiser")
+comment-automatiser/     # LE PLUGIN (source: "./comment-automatiser") — mince et stable
   .claude-plugin/
     plugin.json          # manifeste du plugin
+  .mcp.json              # embarque la connexion au serveur MCP (TUTO_MCP_URL / TUTO_CLE)
   skills/
-    start/
-      SKILL.md           # /comment-automatiser:start — catalogue + lancement
-    status/
-      SKILL.md           # /comment-automatiser:status — progression
-    tuto-hello-mcp/
-      SKILL.md           # orchestrateur du tuto (déroule les étapes + pilote la Loop)
-      etape-1.md         # contenu, chargé à la demande
-      etape-2.md
-      etape-3.md
-      rubrique-verif.md  # critères PASS/FAIL lus par le vérificateur
-    tuto-make-subscenario/
-      SKILL.md
-      etape-1.md … etape-6.md
-      rubrique-verif.md
+    start/SKILL.md       # /comment-automatiser:start — catalogue (via MCP) + lancement
+    status/SKILL.md      # /comment-automatiser:status — progression
+    tuto/SKILL.md        # orchestrateur GÉNÉRIQUE (un seul, data-driven) — pilote la Loop
   agents/
-    verificateur.md      # sous-agent de vérification (lecture seule) — repli inline en Cowork
-  hooks/
-    hooks.json           # SessionStart → rappel discret (Claude Code ; ignoré par Cowork)
-  scripts/
-    progress.sh          # suivi de progression (JSON persistant, via Python 3 — sans jq)
+    verificateur.md      # sous-agent de vérification (lecture seule) — INCHANGÉ
+  hooks/hooks.json       # SessionStart → rappel discret
+  scripts/progress.sh    # suivi de progression (JSON persistant, Python 3, sans jq)
+
+server/                  # LE SERVEUR MCP (contenu + accès gratuit/payant) — voir server/README.md
+  content/<id>/          # source de vérité d'un tuto : tuto.json + etape-*.md + rubrique-verif.md
+  src/                   # mcp.js (protocole), content.js, entitlements.js, index.js (Workers)
+  ...
 ```
+
+Le plugin ne contient **plus** le contenu des tutoriels : il l'obtient du serveur via les outils
+MCP `lister_tutoriels`, `obtenir_tuto`, `obtenir_etape`, `obtenir_rubrique`, `lien_achat`. Un
+**seul** orchestrateur générique (`skills/tuto/`) déroule n'importe quel tuto.
 
 ## Ajouter un tutoriel
 
-Le plugin est **data-driven** : un tutoriel = un dossier `skills/tuto-<id>/`.
+Désormais **côté serveur uniquement** — plus aucune réinstallation du plugin. Voir
+[`server/README.md`](server/README.md) :
 
-1. **Créer le dossier** `skills/tuto-<id>/` avec :
-   - `SKILL.md` : copie l'orchestrateur de `tuto-hello-mcp` et adapte l'`id`, le nombre d'étapes et
-     les chemins. La logique de Loop reste identique.
-   - `etape-1.md`, `etape-2.md`, … : le contenu de chaque étape (objectif + marche à suivre +
-     ce que l'apprenant doit fournir pour être vérifié).
-   - `rubrique-verif.md` : les critères `PASS/FAIL` de chaque étape, lus par le vérificateur.
-2. **Référencer le tuto** dans le catalogue de `skills/start/SKILL.md` (une ligne dans le tableau).
-3. C'est tout : le sous-agent `verificateur` et le suivi `progress.sh` sont **partagés** par tous les
-   tutoriels, rien d'autre à brancher.
+1. Créer `server/content/<nouvel-id>/` (`tuto.json` + `etape-*.md` + `rubrique-verif.md`).
+2. `cd server && npm run build:content && npm test`.
+3. `npx wrangler deploy`.
+
+Le tuto apparaît aussitôt dans `/comment-automatiser:start` chez tous les clients. Le champ `acces`
+(`gratuit`/`payant`) du `tuto.json` décide s'il est verrouillé derrière une clé de licence.
 
 ### Bonnes pratiques de vérification
 - Privilégie une preuve **observable** (fichier, commande, appel MCP réel) ; ne tombe sur du Q&A que
